@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Full Chess Game</title>
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(8, 60px);
+      grid-template-rows: repeat(8, 60px);
+      border: 4px solid white;
+    }
+    .square {
+      width: 60px;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 36px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .light {
+      background-color: #f0d9b5;
+      color: black;
+    }
+    .dark {
+      background-color: #b58863;
+      color: white;
+    }
+    .selected {
+      outline: 3px solid yellow;
+    }
+  </style>
+</head>
+<body>
+  <div class="board" id="chessboard"></div>
+  <script>
+    const board = document.getElementById("chessboard");
+    const pieces = {
+      r: "♜", n: "♞", b: "♝", q: "♛", k: "♚", p: "♟",
+      R: "♖", N: "♘", B: "♗", Q: "♕", K: "♔", P: "♙"
+    };
+
+    let gameState = [
+      ["r", "n", "b", "q", "k", "b", "n", "r"],
+      ["p", "p", "p", "p", "p", "p", "p", "p"],
+      ["", "", "", "", "", "", "", ""],
+      ["", "", "", "", "", "", "", ""],
+      ["", "", "", "", "", "", "", ""],
+      ["", "", "", "", "", "", "", ""],
+      ["P", "P", "P", "P", "P", "P", "P", "P"],
+      ["R", "N", "B", "Q", "K", "B", "N", "R"]
+    ];
+
+    let selected = null;
+    let turn = "white";
+
+    function isWhite(piece) {
+      return piece && piece === piece.toUpperCase();
+    }
+
+    function isBlack(piece) {
+      return piece && piece === piece.toLowerCase();
+    }
+
+    function validMove(from, to) {
+      const piece = gameState[from.row][from.col];
+      const target = gameState[to.row][to.col];
+      if (!piece) return false;
+      if (turn === "white" && !isWhite(piece)) return false;
+      if (turn === "black" && !isBlack(piece)) return false;
+      if (target && (isWhite(target) === isWhite(piece))) return false;
+      return true;
+    }
+
+    function switchTurn() {
+      turn = turn === "white" ? "black" : "white";
+    }
+
+    function renderBoard() {
+      board.innerHTML = "";
+      for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+          const square = document.createElement("div");
+          square.className = `square ${(row + col) % 2 === 0 ? "light" : "dark"}`;
+          square.dataset.row = row;
+          square.dataset.col = col;
+          const piece = gameState[row][col];
+          if (piece) {
+            square.textContent = pieces[piece];
+          }
+          if (selected && selected.row === row && selected.col === col) {
+            square.classList.add("selected");
+          }
+          square.addEventListener("click", () => handleMove(row, col));
+          board.appendChild(square);
+        }
+      }
+    }
+
+    function handleMove(row, col) {
+      if (!selected) {
+        if (gameState[row][col]) {
+          const piece = gameState[row][col];
+          if ((turn === "white" && isWhite(piece)) || (turn === "black" && isBlack(piece))) {
+            selected = { row, col };
+            renderBoard();
+          }
+        }
+      } else {
+        if (selected.row !== row || selected.col !== col) {
+          if (validMove(selected, { row, col })) {
+            gameState[row][col] = gameState[selected.row][selected.col];
+            gameState[selected.row][selected.col] = "";
+            switchTurn();
+          }
+        }
+        selected = null;
+        renderBoard();
+      }
+    }
+
+    renderBoard();
+  </script>
+</body>
+</html>
