@@ -5,11 +5,11 @@ let moved = {
   whiteRookLeft: false,
   whiteRookRight: false,
   blackRookLeft: false,
-  blackRookRight: false
+  blackRookRight: false,
 };
 const pieces = {
   r: "♜", n: "♞", b: "♝", q: "♛", k: "♚", p: "♟",
-  R: "♖", N: "♘", B: "♗", Q: "♕", K: "♔", P: "♙"
+  R: "♖", N: "♘", B: "♗", Q: "♕", K: "♔", P: "♙",
 };
 
 let gameState = [
@@ -20,7 +20,7 @@ let gameState = [
   ["", "", "", "", "", "", "", ""],
   ["", "", "", "", "", "", "", ""],
   ["P", "P", "P", "P", "P", "P", "P", "P"],
-  ["R", "N", "B", "Q", "K", "B", "N", "R"]
+  ["R", "N", "B", "Q", "K", "B", "N", "R"],
 ];
 
 let selected = null;
@@ -46,13 +46,13 @@ function isValidMove(piece, from, to) {
         if (dy === dir) return true;
         if (from.row === startRow && dy === 2 * dir && gameState[from.row + dir][from.col] === "") return true;
       }
-      if (Math.abs(dx) === 1 && dy === dir && gameState[to.row][to.col] !== "") {
+      if (Math.abs(dx) === 1 && dy === dir && gameState[to.row][to.col] !== "" && isWhite(gameState[to.row][to.col]) !== isWhite(piece)) {
         return true;
       }
       break;
     }
     case "r":
-      return (dx === 0 || dy === 0);
+      return dx === 0 || dy === 0;
     case "n":
       return (Math.abs(dx) === 1 && Math.abs(dy) === 2) || (Math.abs(dx) === 2 && Math.abs(dy) === 1);
     case "b":
@@ -60,65 +60,29 @@ function isValidMove(piece, from, to) {
     case "q":
       return dx === 0 || dy === 0 || Math.abs(dx) === Math.abs(dy);
     case "k":
-      return Math.abs(dx) <= 1 && Math.abs(dy) <= 1;
-  }
-  return false;
-}
-
-function validMove(from, to) {
-  if (piece.toLowerCase() === 'p') {
-  const direction = isWhite(piece) ? -1 : 1;
-  const startRow = isWhite(piece) ? 6 : 1;
-
-  const rowDiff = to.row - from.row;
-  const colDiff = Math.abs(to.col - from.col);
-
-  // Regular move
-  if (colDiff === 0 && !target) {
-    if (rowDiff === direction || (from.row === startRow && rowDiff === 2 * direction && !gameState[from.row + direction][from.col])) {
-      return true;
-    }
-  }
-
-  // Capture move
-  if (colDiff === 1 && rowDiff === direction && target && isWhite(target) !== isWhite(piece)) {
-    return true;
-  }
-
-  return false;
-}
-  if (piece.toLowerCase() === 'k') {
-  const rowDiff = Math.abs(to.row - from.row);
-  const colDiff = to.col - from.col;
-
-  // Normal king move (1 square in any direction)
-  if (rowDiff <= 1 && Math.abs(colDiff) <= 1) return true;
-
-  // Castling logic
-  if (rowDiff === 0 && Math.abs(colDiff) === 2) {
-    const isWhitePiece = isWhite(piece);
-    const row = from.row;
-
-    const isLeft = colDiff === -2;
-    const isRight = colDiff === 2;
-
-    const clearLeft = !gameState[row][1] && !gameState[row][2] && !gameState[row][3];
-    const clearRight = !gameState[row][5] && !gameState[row][6];
-
-    if (isWhitePiece) {
-      if (!moved.whiteKing && ((isLeft && !moved.whiteRookLeft && clearLeft) || (isRight && !moved.whiteRookRight && clearRight))) {
-        return true;
+      if (Math.abs(dx) <= 1 && Math.abs(dy) <= 1) return true;
+      if (dy === 0 && Math.abs(dx) === 2) {
+        // Castling logic
+        const isWhitePiece = isWhite(piece);
+        const row = from.row;
+        const isLeft = dx === -2;
+        const isRight = dx === 2;
+        const clearLeft = !gameState[row][1] && !gameState[row][2] && !gameState[row][3];
+        const clearRight = !gameState[row][5] && !gameState[row][6];
+        if (isWhitePiece) {
+          if (!moved.whiteKing && ((isLeft && !moved.whiteRookLeft && clearLeft) || (isRight && !moved.whiteRookRight && clearRight))) {
+            return true;
+          }
+        } else {
+          if (!moved.blackKing && ((isLeft && !moved.blackRookLeft && clearLeft) || (isRight && !moved.blackRookRight && clearRight))) {
+            return true;
+          }
+        }
       }
-    } else {
-      if (!moved.blackKing && ((isLeft && !moved.blackRookLeft && clearLeft) || (isRight && !moved.blackRookRight && clearRight))) {
-        return true;
-      }
-    }
+      break;
   }
-
   return false;
 }
-
 
 function switchTurn() {
   turn = turn === "white" ? "black" : "white";
@@ -158,24 +122,24 @@ function handleMove(row, col) {
   } else {
     const from = selected;
     const to = { row, col };
+    const piece = gameState[from.row][from.col];
     if (from.row !== row || from.col !== col) {
-      if (validMove(from, to)) {
-        gameState[to.row][to.col] = gameState[from.row][from.col];
+      if (isValidMove(piece, from, to)) {
+        gameState[to.row][to.col] = piece;
         gameState[from.row][from.col] = "";
+        // Update moved flags
+        if (piece === "K") moved.whiteKing = true;
+        if (piece === "k") moved.blackKing = true;
+        if (piece === "R" && from.col === 0) moved.whiteRookLeft = true;
+        if (piece === "R" && from.col === 7) moved.whiteRookRight = true;
+        if (piece === "r" && from.col === 0) moved.blackRookLeft = true;
+        if (piece === "r" && from.col === 7) moved.blackRookRight = true;
         switchTurn();
       }
     }
     selected = null;
     renderBoard();
   }
-  const movedPiece = gameState[selected.row][selected.col];
-if (movedPiece === "K") moved.whiteKing = true;
-if (movedPiece === "k") moved.blackKing = true;
-if (movedPiece === "R" && selected.col === 0) moved.whiteRookLeft = true;
-if (movedPiece === "R" && selected.col === 7) moved.whiteRookRight = true;
-if (movedPiece === "r" && selected.col === 0) moved.blackRookLeft = true;
-if (movedPiece === "r" && selected.col === 7) moved.blackRookRight = true;
-
 }
 
 renderBoard();
