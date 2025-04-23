@@ -190,5 +190,4 @@ if (isSquareAttacked(kingPos, turn === "white" ? "black" : "white")) {
     renderBoard();
   }
 }
-
 renderBoard();
