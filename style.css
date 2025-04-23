@@ -25,16 +25,15 @@ body {
   user-select: none;
 }
 .light {
-  background-color: gold;
+  background-color: white;
   color: black;
-  box-shadow: inset -2px -2px 5px rgba(255, 255, 255, 0.3),
-              inset 2px 2px 5px rgba(0, 0, 0, 0.4);
+  box-shadow: inset -2px -2px 5px rgba(255, 255, 255, 0.2),
+              inset 2px 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .dark {
-  background-color: #7B241C;
+  background-color: black;
   color: white;
-  box-shadow: inset -2px -2px 5px rgba(200, 200, 255, 0.1),
-              inset 2px 2px 5px rgba(0, 0, 0, 0.7);
+  box-shadow: inset -2px -2px 5px rgba(255, 255, 255, 0.05),
+              inset 2px 2px 5px rgba(255, 255, 255, 0.1);
 }
-
