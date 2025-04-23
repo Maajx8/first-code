@@ -32,9 +32,9 @@ body {
 }
 
 .dark {
-  background-color: #1a1a1a;
+  background-color: #7B241C;
   color: white;
-  box-shadow: inset -2px -2px 5px rgba(255, 255, 255, 0.1),
+  box-shadow: inset -2px -2px 5px rgba(200, 200, 255, 0.1),
               inset 2px 2px 5px rgba(0, 0, 0, 0.7);
 }
 
