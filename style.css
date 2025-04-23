@@ -25,10 +25,10 @@ body {
   user-select: none;
 }
 .light {
-  background-color: black;
-  color: white; /* Adjust for better contrast */
-}
-.dark {
   background-color: white;
   color: black; /* Adjust for better contrast */
+}
+.dark {
+  background-color: black;
+  color: white; /* Adjust for better contrast */
 }
