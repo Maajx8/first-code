@@ -83,7 +83,33 @@ function isValidMove(piece, from, to) {
   }
   return false;
 }
-
+function findKing(color) {
+  const kingChar = color === "white" ? "K" : "k";
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      if (gameState[row][col] === kingChar) {
+        return { row, col };
+      }
+    }
+  }
+  return null;
+}
+function isSquareAttacked(pos, attackerColor) {
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const attacker = gameState[row][col];
+      if (!attacker) continue;
+      if ((attackerColor === "white" && isWhite(attacker)) ||
+          (attackerColor === "black" && isBlack(attacker))) {
+        const from = { row, col };
+        if (isValidMove(attacker, from, pos)) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
 function switchTurn() {
   turn = turn === "white" ? "black" : "white";
 }
@@ -117,6 +143,19 @@ function handleMove(row, col) {
     const piece = gameState[row][col];
     if (piece && ((turn === "white" && isWhite(piece)) || (turn === "black" && isBlack(piece)))) {
       selected = { row, col };
+      function findKing(color) {
+  const kingChar = color === "white" ? "K" : "k";
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      if (gameState[row][col] === kingChar) {
+        return { row, col };
+      }
+    }
+  }
+  return null;
+}
+  return false;
+}
       renderBoard();
     }
   } else {
@@ -127,6 +166,11 @@ function handleMove(row, col) {
       if (isValidMove(piece, from, to)) {
         gameState[to.row][to.col] = piece;
         gameState[from.row][from.col] = "";
+        // Promotion: if a pawn reaches the final rank, promote to Queen
+if (piece.toLowerCase() === "p" && (to.row === 0 || to.row === 7)) {
+  const isWhitePawn = piece === "P";
+  gameState[to.row][to.col] = isWhitePawn ? "Q" : "q"; // auto promote to Queen
+}
         // Update moved flags
         if (piece === "K") moved.whiteKing = true;
         if (piece === "k") moved.blackKing = true;
@@ -135,6 +179,11 @@ function handleMove(row, col) {
         if (piece === "r" && from.col === 0) moved.blackRookLeft = true;
         if (piece === "r" && from.col === 7) moved.blackRookRight = true;
         switchTurn();
+const kingPos = findKing(turn);
+if (isSquareAttacked(kingPos, turn === "white" ? "black" : "white")) {
+  alert("Check!");
+}
+
       }
     }
     selected = null;
