@@ -1,5 +1,12 @@
 const board = document.getElementById("chessboard");
-
+let moved = {
+  whiteKing: false,
+  blackKing: false,
+  whiteRookLeft: false,
+  whiteRookRight: false,
+  blackRookLeft: false,
+  blackRookRight: false
+};
 const pieces = {
   r: "♜", n: "♞", b: "♝", q: "♛", k: "♚", p: "♟",
   R: "♖", N: "♘", B: "♗", Q: "♕", K: "♔", P: "♙"
@@ -80,6 +87,38 @@ function validMove(from, to) {
 
   return false;
 }
+  if (piece.toLowerCase() === 'k') {
+  const rowDiff = Math.abs(to.row - from.row);
+  const colDiff = to.col - from.col;
+
+  // Normal king move (1 square in any direction)
+  if (rowDiff <= 1 && Math.abs(colDiff) <= 1) return true;
+
+  // Castling logic
+  if (rowDiff === 0 && Math.abs(colDiff) === 2) {
+    const isWhitePiece = isWhite(piece);
+    const row = from.row;
+
+    const isLeft = colDiff === -2;
+    const isRight = colDiff === 2;
+
+    const clearLeft = !gameState[row][1] && !gameState[row][2] && !gameState[row][3];
+    const clearRight = !gameState[row][5] && !gameState[row][6];
+
+    if (isWhitePiece) {
+      if (!moved.whiteKing && ((isLeft && !moved.whiteRookLeft && clearLeft) || (isRight && !moved.whiteRookRight && clearRight))) {
+        return true;
+      }
+    } else {
+      if (!moved.blackKing && ((isLeft && !moved.blackRookLeft && clearLeft) || (isRight && !moved.blackRookRight && clearRight))) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 
 function switchTurn() {
   turn = turn === "white" ? "black" : "white";
@@ -129,6 +168,14 @@ function handleMove(row, col) {
     selected = null;
     renderBoard();
   }
+  const movedPiece = gameState[selected.row][selected.col];
+if (movedPiece === "K") moved.whiteKing = true;
+if (movedPiece === "k") moved.blackKing = true;
+if (movedPiece === "R" && selected.col === 0) moved.whiteRookLeft = true;
+if (movedPiece === "R" && selected.col === 7) moved.whiteRookRight = true;
+if (movedPiece === "r" && selected.col === 0) moved.blackRookLeft = true;
+if (movedPiece === "r" && selected.col === 7) moved.blackRookRight = true;
+
 }
 
 renderBoard();
