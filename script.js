@@ -59,13 +59,26 @@ function isValidMove(piece, from, to) {
 }
 
 function validMove(from, to) {
-  const piece = gameState[from.row][from.col];
-  const target = gameState[to.row][to.col];
-  if (!piece) return false;
-  if (turn === "white" && !isWhite(piece)) return false;
-  if (turn === "black" && !isBlack(piece)) return false;
-  if (target && (isWhite(target) === isWhite(piece))) return false;
-  return isValidMove(piece, from, to);
+  if (piece.toLowerCase() === 'p') {
+  const direction = isWhite(piece) ? -1 : 1;
+  const startRow = isWhite(piece) ? 6 : 1;
+
+  const rowDiff = to.row - from.row;
+  const colDiff = Math.abs(to.col - from.col);
+
+  // Regular move
+  if (colDiff === 0 && !target) {
+    if (rowDiff === direction || (from.row === startRow && rowDiff === 2 * direction && !gameState[from.row + direction][from.col])) {
+      return true;
+    }
+  }
+
+  // Capture move
+  if (colDiff === 1 && rowDiff === direction && target && isWhite(target) !== isWhite(piece)) {
+    return true;
+  }
+
+  return false;
 }
 
 function switchTurn() {
